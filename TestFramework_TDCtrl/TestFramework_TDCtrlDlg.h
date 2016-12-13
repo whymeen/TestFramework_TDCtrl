@@ -3,7 +3,10 @@
 //
 
 #pragma once
-
+#include "afxwin.h"
+#include "afxcmn.h"
+#include "objectBase.h"
+#include "ObjectMananger.h"
 
 // CTestFramework_TDCtrlDlg 대화 상자
 class CTestFramework_TDCtrlDlg : public CDialogEx
@@ -20,6 +23,40 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
+public:
+
+	int m_iCurObjectID;
+	CObjectMananger m_pObjectManager;
+
+	CComboBox m_cvCbxObjectID;
+	CComboBox m_cvCbxTorpedoIDList;
+	CComboBox m_cvCbxDecoyList;
+	CComboBox m_cvCbxOperationMode;
+	CComboBox m_cvCbxSendingMode;
+	CEdit m_cvEditFrequence;
+	CEdit m_cvEditSoundPressure;
+	CEdit m_cvEditBeamWidth;
+	CEdit m_cvEditDecoyDoppler;
+	CEdit m_cvEditThrowingDistance;
+	CEdit m_cvEditThrowingDirection;
+	CEdit m_cvEditWorkingTime;
+	CEdit m_cvEditDelayTime;
+	CComboBox m_cvCbxStraightSearchMode;
+	CComboBox m_cvCbxTorpedoState;
+	CComboBox m_cvCbxGuidMode;
+	CComboBox m_cvCbxGuidMethod;
+	CComboBox m_cvCbxSpeedStep;
+	CComboBox m_cvCbxTargetMode;
+	CComboBox m_cvCbxTargetDetectStatus;
+	CComboBox m_cvCbxTOSOMode;
+	CComboBox m_cvCbxTransCtrlMode;
+	CComboBox m_cvCbxTransPursMode;
+	CComboBox m_cvCbxTargetSupport;
+	CEdit m_cvEditCourse;
+	CEdit m_cvEditProCourse;
+	CEdit m_cvEditHDepth;
+	CEdit m_cvEditMDepth;
+	CEdit m_cvEditLDepth;
 
 // 구현입니다.
 protected:
@@ -31,4 +68,15 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnCbnSelendcancelComboObjectid();
+	afx_msg void OnBnClickedButtonFire();
+	afx_msg void OnBnClickedButtonDecoyFire();
+	afx_msg void OnBnClickedButtonTorpedoPreset();
+	afx_msg void OnBnClickedButtonDecoyPreset();
+	afx_msg void OnBnClickedButtonTubeAssignment();
+	afx_msg void OnBnClickedButtonTubeStatus();
+
+	void addObject(int objectID);
+	void deleteObject(int objectID);
 };

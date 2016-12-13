@@ -53,3 +53,6 @@
 #endif
 
 
+#include "EASStruct.h"
+#include "EASCommon.h"
+#include "EASMsgCode.h"
