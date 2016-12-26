@@ -87,6 +87,9 @@ void CTestFramework_TDCtrlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_H_DEPTH, m_cvEditHDepth);
 	DDX_Control(pDX, IDC_EDIT_M_DEPTH, m_cvEditMDepth);
 	DDX_Control(pDX, IDC_EDIT_L_DEPTH, m_cvEditLDepth);
+	DDX_Control(pDX, IDC_SLIDER_HORIZENTAL, m_cvSldHeading);
+	DDX_Control(pDX, IDC_SLIDER_DEPTH, m_cvSldDepth);
+	DDX_Control(pDX, IDC_SLIDER_VERTICAL, m_cvSldVelocity);
 }
 
 BEGIN_MESSAGE_MAP(CTestFramework_TDCtrlDlg, CDialogEx)
@@ -100,7 +103,14 @@ BEGIN_MESSAGE_MAP(CTestFramework_TDCtrlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_DECOY_PRESET, &CTestFramework_TDCtrlDlg::OnBnClickedButtonDecoyPreset)
 	ON_BN_CLICKED(IDC_BUTTON_TUBE_ASSIGNMENT, &CTestFramework_TDCtrlDlg::OnBnClickedButtonTubeAssignment)
 	ON_BN_CLICKED(IDC_BUTTON_TUBE_STATUS, &CTestFramework_TDCtrlDlg::OnBnClickedButtonTubeStatus)
-END_MESSAGE_MAP()
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER_HORIZENTAL, &CTestFramework_TDCtrlDlg::OnNMCustomdrawSliderHorizental)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER_DEPTH, &CTestFramework_TDCtrlDlg::OnNMCustomdrawSliderDepth)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER_VERTICAL, &CTestFramework_TDCtrlDlg::OnNMCustomdrawSliderVertical)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_H, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetH)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_DEPTH, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetDepth)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_V, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetV)
+	ON_BN_CLICKED(IDC_BUTTON_RESET_ALL, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetAll)
+	END_MESSAGE_MAP()
 
 
 // CTestFramework_TDCtrlDlg 메시지 처리기
@@ -215,6 +225,15 @@ BOOL CTestFramework_TDCtrlDlg::OnInitDialog()
 	m_cvCbxSendingMode.InsertString(1, "수동");
 	m_cvCbxSendingMode.InsertString(2, "혼합");
 	m_cvCbxSendingMode.SetCurSel(0);
+
+
+	m_cvSldHeading.SetRange(0, 100);
+	m_cvSldVelocity.SetRange(0, 100);
+	m_cvSldDepth.SetRange(0, 100);
+
+	m_cvSldHeading.SetPos(50);
+	m_cvSldVelocity.SetPos(50);
+	m_cvSldDepth.SetPos(50);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -729,7 +748,20 @@ void CTestFramework_TDCtrlDlg::OnBnClickedButtonDecoyPreset()
 
 void CTestFramework_TDCtrlDlg::OnBnClickedButtonTubeAssignment()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	TubeAssignmentDlg tubeAssignmentDlg;
+
+	tubeAssignmentDlg.setCurObjectID(m_iCurObjectID);
+
+	if (tubeAssignmentDlg.DoModal() == IDOK)
+	{
+		AfxMessageBox("할당정보를 네트워크로 전달했다 !!");
+	}
+	else
+	{
+		AfxMessageBox("할당정보 전달을 취소했다 !!");
+	}
+
+
 }
 
 
@@ -799,4 +831,64 @@ void CTestFramework_TDCtrlDlg::deleteObject(int objectID)
 			break;
 		}
 	}
+}
+
+void CTestFramework_TDCtrlDlg::OnNMCustomdrawSliderHorizental(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int iIncreaseHeading = 50 - m_cvSldHeading.GetPos();
+	m_pObjectManager.updateObjectAVel(m_iCurObjectID, (double)iIncreaseHeading*0.01);
+	*pResult = 0;
+}
+
+
+void CTestFramework_TDCtrlDlg::OnNMCustomdrawSliderDepth(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int iIncreaseDepth = 50 - m_cvSldDepth.GetPos();
+	m_pObjectManager.updateObjectDVel(m_iCurObjectID, (double)iIncreaseDepth*0.01);
+	*pResult = 0;
+}
+
+
+void CTestFramework_TDCtrlDlg::OnNMCustomdrawSliderVertical(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int iVelcity = 50 - m_cvSldVelocity.GetPos();
+	m_pObjectManager.updateObjectVel(m_iCurObjectID, (double)iVelcity*0.01);
+	*pResult = 0;
+}
+
+
+void CTestFramework_TDCtrlDlg::OnBnClickedButtonResetH()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_cvSldHeading.SetPos(50);
+}
+
+
+void CTestFramework_TDCtrlDlg::OnBnClickedButtonResetDepth()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_cvSldDepth.SetPos(50);
+}
+
+
+
+void CTestFramework_TDCtrlDlg::OnBnClickedButtonResetV()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_cvSldVelocity.SetPos(50);
+}
+
+
+void CTestFramework_TDCtrlDlg::OnBnClickedButtonResetAll()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_cvSldHeading.SetPos(50);
+	m_cvSldVelocity.SetPos(50);
+	m_cvSldDepth.SetPos(50);
 }

@@ -7,6 +7,8 @@
 #include "afxcmn.h"
 #include "objectBase.h"
 #include "ObjectMananger.h"
+#include "TubeAssignmentDlg.h"
+
 
 // CTestFramework_TDCtrlDlg 대화 상자
 class CTestFramework_TDCtrlDlg : public CDialogEx
@@ -58,6 +60,10 @@ public:
 	CEdit m_cvEditMDepth;
 	CEdit m_cvEditLDepth;
 
+	CSliderCtrl m_cvSldHeading;
+	CSliderCtrl m_cvSldDepth;
+	CSliderCtrl m_cvSldVelocity;
+
 // 구현입니다.
 protected:
 	HICON m_hIcon;
@@ -79,4 +85,12 @@ public:
 
 	void addObject(int objectID);
 	void deleteObject(int objectID);
+	afx_msg void OnNMCustomdrawSliderHorizental(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMCustomdrawSliderDepth(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMCustomdrawSliderVertical(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedButtonResetH();
+	afx_msg void OnBnClickedButtonResetDepth();
+//	afx_msg void OnBnDropDownButtonResetV(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedButtonResetV();
+	afx_msg void OnBnClickedButtonResetAll();
 };
