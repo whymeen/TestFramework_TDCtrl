@@ -8,7 +8,7 @@
 #include "objectBase.h"
 #include "ObjectMananger.h"
 #include "TubeAssignmentDlg.h"
-
+#include "ThreadFunc.h"
 
 // CTestFramework_TDCtrlDlg 대화 상자
 class CTestFramework_TDCtrlDlg : public CDialogEx
@@ -90,7 +90,9 @@ public:
 	afx_msg void OnNMCustomdrawSliderVertical(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedButtonResetH();
 	afx_msg void OnBnClickedButtonResetDepth();
-//	afx_msg void OnBnDropDownButtonResetV(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedButtonResetV();
 	afx_msg void OnBnClickedButtonResetAll();
+
+public:
+	ThreadFunc threadFunc;
 };
