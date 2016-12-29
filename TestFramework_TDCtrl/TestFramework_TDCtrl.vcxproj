@@ -181,6 +181,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConnectSocket.h" />
     <ClInclude Include="EASCommon.h" />
     <ClInclude Include="EASMsgCode.h" />
     <ClInclude Include="EASStruct.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="TubeAssignmentDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ConnectSocket.cpp" />
     <ClCompile Include="objectBase.cpp" />
     <ClCompile Include="ObjectMananger.cpp" />
     <ClCompile Include="stdafx.cpp">

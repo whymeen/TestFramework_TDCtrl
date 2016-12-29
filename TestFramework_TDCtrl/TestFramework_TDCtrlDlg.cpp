@@ -144,7 +144,18 @@ BOOL CTestFramework_TDCtrlDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
-	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	//소켓연결
+	
+	m_Socket.Create();
+	if (m_Socket.Connect(_T("127.0.0.1"), 21000) == FALSE)
+	{
+		AfxMessageBox(_T("ERROR: Failed to connect server"));
+		PostQuitMessage(0);
+
+		return FALSE;
+	}
+
+	// 초기 값 설정
 
 	m_iCurObjectID = 0;
 
@@ -693,9 +704,9 @@ void CTestFramework_TDCtrlDlg::OnBnClickedButtonDecoyPreset()
 	double dSpeed1 = 0.0;
 	double dSpeed2 = 0.0;
 	double dSpeed3 = 0.0;
-	double H1, P1, R1;
-	double H2, P2, R2;
-	double H3, P3, R3;
+//	double H1, P1, R1;
+//	double H2, P2, R2;
+//	double H3, P3, R3;
 	double dDepth1 = 0.0;
 	double dDepth2 = 0.0;
 	double dDepth3 = 0.0;

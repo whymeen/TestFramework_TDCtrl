@@ -1,8 +1,5 @@
 #include "stdafx.h"
 #include "ThreadFunc.h"
-#include "ObjectMananger.h"
-#include "TestFramework_TDCtrlDlg.h"
-#include "TestFramework_TDCtrl.h"
 
 
 ThreadFunc::ThreadFunc()
@@ -40,7 +37,7 @@ UINT ThreadFunc::MainThreadFunc(LPVOID pParam)
 
 		FrameLimit = 33; // FRAME_30HZ
 
-		// 프로세스 one step의 시작시간 [6/11/2010 boxface]
+						 // 프로세스 one step의 시작시간 [6/11/2010 boxface]
 		QueryPerformanceCounter(&pThread->m_liST);
 
 		// 프로세스 처리 [6/11/2010 boxface]
@@ -84,6 +81,7 @@ UINT ThreadFunc::MainThreadFunc(LPVOID pParam)
 
 	pThread->m_hMainThread = NULL;
 
+
 	AfxEndThread(0, TRUE);
 
 	return 0;
@@ -105,6 +103,12 @@ void ThreadFunc::onThreadStart()
 		m_pMainThread->ResumeThread();
 		m_dNowtime = GetTickCount();
 	}
+}
+
+void ThreadFunc::onThreadPause()
+{
+	m_pMainThread->SuspendThread();
+	m_bStopMainThread = FALSE;
 }
 
 
@@ -139,7 +143,8 @@ void ThreadFunc::onThreadEnd()
 
 void ThreadFunc::process()
 {
-	int i, count = pMainDlg->m_pObjectManager.GetSize();
+	CTestFramework_TDCtrlDlg* pMain = (CTestFramework_TDCtrlDlg*)AfxGetMainWnd();
+	int i, count = pMain->m_pObjectManager.GetSize();
 
 	int iObjectID;
 	int iObjectType;
@@ -157,7 +162,7 @@ void ThreadFunc::process()
 
 	for (i = 0; i<count; i++)
 	{
-		CObjectBase *pObject = pMainDlg->m_pObjectManager.GetObjectPointerIdx(i);
+		CObjectBase *pObject = pMain->m_pObjectManager.GetObjectPointerIdx(i);
 
 		if (pObject->getObjectStatus() != OBJECT_STATUS_ENABLE)
 		{
@@ -187,6 +192,6 @@ void ThreadFunc::process()
 		p = 0.0;
 		r = 0.0;
 
-		pMainDlg->m_pObjectManager.updateObject(iObjectID, x, y, z, h, p, r);
+		pMain->m_pObjectManager.updateObject(iObjectID, x, y, z, h, p, r);
 	}
 }
