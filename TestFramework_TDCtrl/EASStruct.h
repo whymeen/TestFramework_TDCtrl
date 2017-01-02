@@ -64,23 +64,23 @@ typedef struct _EVENT_SIMULATION_CONTROL_0x11
 } EVENT_SIMULATION_CONTROL;
 
 
-typedef struct _EVENT_SCENARIO_SETUP_0x12
+/*typedef struct _EVENT_SCENARIO_SETUP_0x12
 {
-	Uint8 type;
-	Uint8 length;
+Uint8 type;
+Uint8 length;
 
-	Uint8 ownship_Num;
-	Uint8 targetship_Num;
-	Uint8 torpedo_Num;
-	Uint8 decoy_Num;
-	Uint8 sensor_Num;
-	Uint8 reserved0;
-	Uint16 reserved1;
+Uint8 ownship_Num;
+Uint8 targetship_Num;
+Uint8 torpedo_Num;
+Uint8 decoy_Num;
+Uint8 sensor_Num;
+Uint8 reserved0;
+Uint16 reserved1;
 
-} EVENT_SCENARIO_SETUP;
+} EVENT_SCENARIO_SETUP; */
 
 
-typedef struct _EVENT_OBJECT_CONTROL_0x13
+typedef struct _EVENT_OBJECT_CONTROL_0x12
 {
 	Uint8 type;
 	Uint8 length;
@@ -114,14 +114,14 @@ typedef struct _EVENT_OBJECT_CONTROL_0x13
 } EVENT_OBJECT_CONTROL;
 
 
-typedef struct _EVENT_TORPEDO_SETUP_0x14
+typedef struct _EVENT_TORPEDO_SETUP_0x13
 {
 	Uint8 type;
 	Uint8 length;
 
 	Uint16 objectID;
 
-	Uint8 torpedoType;	
+	Uint8 torpedoType;
 	Uint8 imageType;
 	Uint16 parentID;
 
@@ -133,26 +133,26 @@ typedef struct _EVENT_TORPEDO_SETUP_0x14
 	Sflt32 maxTime;
 	Sflt32 maxRange;
 
-	Uint8 searchPattenMode;	
+	Uint8 searchPattenMode;
 	Uint8 ACCMAbility : 3;
-	Uint8 guidanceMode : 3;	
+	Uint8 guidanceMode : 3;
 	Uint8 strightSearchMode : 2;
-	Uint8 tube_Number : 5;	
+	Uint8 tube_Number : 5;
 	Uint8 torpedo_Mode : 3;
 	Uint8 reserved;
-	
+
 
 } EVENT_TORPEDO_SETUP;
 
 
-typedef struct _EVENT_DECOY_SETUP_0x15
+typedef struct _EVENT_DECOY_SETUP_0x14
 {
 	Uint8 type;
 	Uint8 length;
 
 	Uint16 objectID;
 
-	Uint8 decoyType;	
+	Uint8 decoyType;
 	Uint8 imageType;
 	Uint16 parentID;
 
@@ -165,7 +165,7 @@ typedef struct _EVENT_DECOY_SETUP_0x15
 	Sflt32 reactionDelayTime;
 	Sflt32 workingDelayTime;
 
-	Uint8 operationMode;	
+	Uint8 operationMode;
 	Uint8 reserved0;
 	Uint16 reserved1;
 
@@ -179,7 +179,7 @@ typedef struct _EVENT_SENSOR_SETUP_0x16
 
 	Uint16 parentID;
 
-	Uint8 sensorID;	
+	Uint8 sensorID;
 	Uint8 reserved0;
 	Uint16 reserved1;
 
@@ -237,7 +237,7 @@ typedef struct _EVENT_SCENARIO_SETUP_REPLY_0x22
 	Uint8 length : 8;
 
 	Uint8 setup_reply;	// 0:설정에 문제있음 1:문제없음
-	Uint8 reserved;	 
+	Uint8 reserved;
 
 } EVENT_SCENARIO_SETUP_REPLY;
 
@@ -286,7 +286,7 @@ typedef struct _EVENT_LOGIN_REPLY_0x24
 {
 	Uint8 type;
 	Uint8 length;
-	Uint16 status:1;
+	Uint16 status : 1;
 	Uint16 reserved : 15;
 
 } EVENT_LOGIN_REPLY;
@@ -322,7 +322,7 @@ typedef struct _EVENT_TORPEDO_PRESET_0x51
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 	Uint8 speedStep : 2;
@@ -335,9 +335,9 @@ typedef struct _EVENT_TORPEDO_PRESET_0x51
 	Uint8 floorStatus : 1;
 	Uint8 reserved0 : 5;
 
-	Uint8 linked_Launch ;
-	Uint8 reserved1 ;
-	Uint16 reserved2 ;
+	Uint8 linked_Launch;
+	Uint8 reserved1;
+	Uint16 reserved2;
 
 	Sflt32 lateral_Offset;
 	Sflt32 mainDirection;
@@ -371,7 +371,7 @@ typedef struct _EVENT_TORPEDO_PRESET_REPLY_0x61
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 	Uint8 speedStep : 2;
@@ -384,9 +384,9 @@ typedef struct _EVENT_TORPEDO_PRESET_REPLY_0x61
 	Uint8 floorStatus : 1;
 	Uint8 reserved0 : 5;
 
-	Uint8 linked_Launch ;
-	Uint8 reserved1 ;
-	Uint16 reserved2 ;
+	Uint8 linked_Launch;
+	Uint8 reserved1;
+	Uint16 reserved2;
 
 	Sflt32 lateral_Offset;
 	Sflt32 mainDirection;
@@ -409,7 +409,7 @@ typedef struct _UPDATE_TORPEDO_STATUS_0x62
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 
@@ -540,7 +540,7 @@ typedef struct _EVENT_TARGETSHIP_CONTROL_0x73
 	Uint8 length;
 	Uint16 objectID;
 
-	Sflt32 speed;			
+	Sflt32 speed;
 	Sflt32 rudderAngle;
 	Sflt32 elevatorAngle;
 
@@ -566,7 +566,7 @@ typedef struct _EVENT_TARGETSHIP_CONTROL_REPLY_0x82
 	Uint8 length;
 	Uint16 objectID;
 
-	Sflt32 speed;			
+	Sflt32 speed;
 	Sflt32 rudderAngle;
 	Sflt32 elevatorAngle;
 
@@ -591,7 +591,7 @@ typedef struct _EVENT_TORPEDO_SIM_PRESET_0x92
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 	Uint8 speedStep : 2;
@@ -607,9 +607,9 @@ typedef struct _EVENT_TORPEDO_SIM_PRESET_0x92
 	Uint8 attackPlanningCopy : 1;
 	Uint8 reserved0 : 2;
 
-	Uint8 linked_Launch ;
-	Uint8 reserved1 ;
-	Uint16 reserved2 ;
+	Uint8 linked_Launch;
+	Uint8 reserved1;
+	Uint16 reserved2;
 
 	Sflt32 lateral_Offset;
 	Sflt32 mainDirection;
@@ -630,10 +630,10 @@ typedef struct _EVENT_SIM_CONTROL_0x93
 {
 	Uint8 type;
 	Uint8 length;
-	Uint8 simMode: 2;		//0 = "-", 1 = "ON"
-	Uint8 attackPlanningMode: 2;	//0 = "-", 1 = "ON"
-	Uint8 displayMode: 2;		//0 = "-", 1 = "ON"
-	Uint8 copyMode: 2;		//0 = "COPY", 1 = " ",  2 = " "
+	Uint8 simMode : 2;		//0 = "-", 1 = "ON"
+	Uint8 attackPlanningMode : 2;	//0 = "-", 1 = "ON"
+	Uint8 displayMode : 2;		//0 = "-", 1 = "ON"
+	Uint8 copyMode : 2;		//0 = "COPY", 1 = " ",  2 = " "
 	Uint8 reserved;
 
 } EVENT_SIM_CONTROL;
@@ -645,7 +645,7 @@ typedef struct _EVENT_OWNSHIP_CONTROL_0x94
 	Uint8 length;
 	Uint16 objectID;
 
-	Sflt32 speed;			
+	Sflt32 speed;
 	Sflt32 rudderAngle;
 	Sflt32 elevatorAngle;
 
@@ -657,20 +657,20 @@ typedef struct _EVENT_TOUCH_PANEL_CONTROL_0x95
 	Uint8 type;
 	Uint8 length;
 	Uint16 objectID;
-	
+
 	Uint16 Firing_objectID;
 	Uint16 Target_objectID;
 
-	Uint8 abort_fire: 1;
-	Uint8 fire: 1;
-	Uint8 internal_Guidance: 1;
-	Uint8 manual_Guidance: 1;
-	Uint8 toso_boso: 2;
+	Uint8 abort_fire : 1;
+	Uint8 fire : 1;
+	Uint8 internal_Guidance : 1;
+	Uint8 manual_Guidance : 1;
+	Uint8 toso_boso : 2;
 	Uint8 override: 1;
-	Uint8 stopWatch: 1;
-	
+	Uint8 stopWatch : 1;
+
 	Uint8 reserved0;
-	Uint16 reserved1;		
+	Uint16 reserved1;
 
 } EVENT_TOUCH_PANEL_CONTROL;
 
@@ -695,8 +695,8 @@ typedef struct _UPDATE_TUBE_STATUS_0xA2
 
 	Uint8 tube_Number;
 	Uint16 target_ObjectID;
-	Uint8 torpedoState :4;
-	Uint8 check_TWS :4;
+	Uint8 torpedoState : 4;
+	Uint8 check_TWS : 4;
 
 	Uint8 tube_status : 4;
 	Uint8 weaponType : 2;
@@ -718,7 +718,7 @@ typedef struct _EVENT_TORPEDO_SIM_PRESET_REPLY_0xA3
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 	Uint8 speedStep : 2;
@@ -734,9 +734,9 @@ typedef struct _EVENT_TORPEDO_SIM_PRESET_REPLY_0xA3
 	Uint8 attackPlanningCopy : 1;
 	Uint8 reserved0 : 2;
 
-	Uint8 linked_Launch ;
-	Uint8 reserved1 ;
-	Uint16 reserved2 ;
+	Uint8 linked_Launch;
+	Uint8 reserved1;
+	Uint16 reserved2;
 
 	Sflt32 lateral_Offset;
 	Sflt32 mainDirection;
@@ -759,7 +759,7 @@ typedef struct _UPDATE_TORPEDO_SIM_STATUS_0xA4
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 
@@ -811,7 +811,7 @@ typedef struct _UPDATE_OWNSHIP_STATUS_0xA5
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 objectType ;
+	Uint8 objectType;
 	Uint8 reserved0;
 	Uint16 reserved1;
 
@@ -831,10 +831,10 @@ typedef struct _UPDATE_TARGETSHIP_STATUS_0xA6
 	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 objectType ;
+	Uint8 objectType;
 	Uint16 targetID;
-	Uint8 IFF: 2;
-	Uint8 targetClass: 2;
+	Uint8 IFF : 2;
+	Uint8 targetClass : 2;
 	Uint8 PT : 1;
 	Uint8 SC : 1;
 	Uint8 RC : 1;
@@ -860,11 +860,11 @@ typedef struct _EVENT_SIM_CONTROL_REPLY_0xA7
 {
 	Uint8 type;
 	Uint8 length;
-	Uint8 simMode: 2;		//0 = "-", 1 = "ON"
-	Uint8 attackPlanningMode: 2;	//0 = "-", 1 = "ON"
-	Uint8 displayMode: 2;		//0 = "-", 1 = "ON"
-	Uint8 copyMode: 3;		//0 = "COPY", 1 = " ",  2 = " "
-	Uint8 reserved;	
+	Uint8 simMode : 2;		//0 = "-", 1 = "ON"
+	Uint8 attackPlanningMode : 2;	//0 = "-", 1 = "ON"
+	Uint8 displayMode : 2;		//0 = "-", 1 = "ON"
+	Uint8 copyMode : 3;		//0 = "COPY", 1 = " ",  2 = " "
+	Uint8 reserved;
 
 } EVENT_SIM_CONTROL_REPLY;
 
@@ -875,7 +875,7 @@ typedef struct _EVENT_OWNSHIP_CONTROL_REPLY_0xA8
 	Uint8 length;
 	Uint16 objectID;
 
-	Sflt32 speed;			
+	Sflt32 speed;
 	Sflt32 rudderAngle;
 	Sflt32 elevatorAngle;
 
@@ -890,7 +890,7 @@ typedef struct _EVENT_TORPEDO_TARGET_STRENGTH_0xA9
 
 	Uint16 targetNum;
 	Uint16 reserved0;
-	
+
 	// STRUCT_TARGET_STRENGTH data[targetNum];
 
 } EVENT_TORPEDO_TARGET_STRENGTH;
@@ -905,7 +905,7 @@ typedef struct _UPDATE_TORPEDO_SONAR_0xAA
 	Sflt32 min_frequence;
 	Sflt32 max_frequence;
 	Uint32 resolution;
-	
+
 	// db[resolution];
 
 } EVENT_TORPEDO_SONAR;
@@ -920,7 +920,7 @@ typedef struct _UPDATE_OWNSHIP_SONAR_0xAB
 	Sflt32 min_frequence;
 	Sflt32 max_frequence;
 	Uint32 resolution;
-	
+
 	// db[resolution];
 
 } UPDATE_OWNSHIP_SONAR;
@@ -992,10 +992,10 @@ typedef struct _STRUCT_DECOY_INFO
 typedef struct _UPDATE_TORPEDO_STATUS_0x63
 {
 	Uint8 type;
-	Uint8 length; 
+	Uint8 length;
 	Uint16 objectID;
 
-	Uint8 torpedoState :4;
+	Uint8 torpedoState : 4;
 	Uint8 guidanceMode : 2;
 	Uint8 guidanceMethod : 2;
 	Sflt32 depth;

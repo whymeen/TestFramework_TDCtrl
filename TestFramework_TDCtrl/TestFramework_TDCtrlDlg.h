@@ -8,7 +8,7 @@
 #include "objectBase.h"
 #include "ObjectMananger.h"
 #include "TubeAssignmentDlg.h"
-#include "ConnectSocket.h"
+#include "TCPFunc.h"
 
 // CTestFramework_TDCtrlDlg 대화 상자
 class CTestFramework_TDCtrlDlg : public CDialogEx
@@ -26,7 +26,8 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
 public:
-	CConnectSocket		m_Socket;
+	
+	TCPFunc m_TCPfunc;
 
 	int m_iCurObjectID;
 	CObjectMananger m_pObjectManager;

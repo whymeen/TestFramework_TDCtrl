@@ -144,16 +144,7 @@ BOOL CTestFramework_TDCtrlDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
-	//소켓연결
 	
-	m_Socket.Create();
-	if (m_Socket.Connect(_T("127.0.0.1"), 21000) == FALSE)
-	{
-		AfxMessageBox(_T("ERROR: Failed to connect server"));
-		PostQuitMessage(0);
-
-		return FALSE;
-	}
 
 	// 초기 값 설정
 
@@ -452,7 +443,7 @@ void CTestFramework_TDCtrlDlg::OnBnClickedButtonFire()
 	EVENT_OBJECT_CONTROL sendData;
 	memset(&sendData, 0x00, sizeof(EVENT_OBJECT_CONTROL));
 
-	sendData.type = MSG_CODE_EVENT_OBJECT_CONTROL_0x13;
+	sendData.type = MSG_CODE_EVENT_OBJECT_SETUP_0x12;
 	sendData.length = sizeof(EVENT_OBJECT_CONTROL);
 
 	sendData.mode = OBJECT_CTRL_CREATE;
@@ -571,7 +562,7 @@ void CTestFramework_TDCtrlDlg::OnBnClickedButtonDecoyFire()
 	EVENT_OBJECT_CONTROL sendData;
 	memset(&sendData, 0x00, sizeof(EVENT_OBJECT_CONTROL));
 
-	sendData.type = MSG_CODE_EVENT_OBJECT_CONTROL_0x13;
+	sendData.type = MSG_CODE_EVENT_OBJECT_SETUP_0x12;
 	sendData.length = sizeof(EVENT_OBJECT_CONTROL);
 
 	sendData.mode = OBJECT_CTRL_CREATE;
