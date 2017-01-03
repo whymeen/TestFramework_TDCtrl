@@ -119,33 +119,33 @@ public:
 	~Common(void);
 
 	// 문자열 변환 함수 [3/31/2007 boxface]
-//	static CString		stdToCString(std::string s)	{return s.c_str();}
-//	static std::string		CStringTostd(CString c)	{return (LPCTSTR)c;}
+	//	static CString		stdToCString(std::string s)	{return s.c_str();}
+	//	static std::string		CStringTostd(CString c)	{return (LPCTSTR)c;}
 
-//	static char*		CStringTochar(CString c)	{return (LPSTR)(LPCSTR)c;}
-//	static char*		stdTochar(std::string s)	{CString cst = s.c_str();		return (LPSTR)(LPCSTR)cst;}
+	//	static char*		CStringTochar(CString c)	{return (LPSTR)(LPCSTR)c;}
+	//	static char*		stdTochar(std::string s)	{CString cst = s.c_str();		return (LPSTR)(LPCSTR)cst;}
 
-	static int			sizeOfCString(CString c)		{return c.GetLength();}
-	static int			sizeOfstdString(std::string s)		{return (int)s.size();}
+	static int			sizeOfCString(CString c) { return c.GetLength(); }
+	static int			sizeOfstdString(std::string s) { return (int)s.size(); }
 
 	// 색상 변환 [8/20/2007 boxface]
 	static CString		SetNamedColor(COLORREF col);
-	static char*		SetNamedColorToChar(COLORREF col);		
+	static char*		SetNamedColorToChar(COLORREF col);
 	static COLORREF		GetColorCSName(const CString &csCol);
 	static COLORREF		GetColorStdName(const std::string &sCol);
 
 	static CString	GetSystemName(int systemCode)
 	{
 		CString SystemName;
-		switch(systemCode)
+		switch (systemCode)
 		{
-		case EQUIP_CODE_OPERATION_CONTROL:			SystemName="운용통제기";			break;
-		case EQUIP_CODE_BATTLEFIELD_DISPLAY:		SystemName="전장가시화";			break;
-		case EQUIP_CODE_OWNSHIP:					SystemName="운용함 모의기";			break;
-		case EQUIP_CODE_NEW_HEAVY_TORPEDO:		    SystemName="차기중어뢰 모의기";		break;
-		case EQUIP_CODE_TARGETSHIP:					SystemName="표적함 모의기";			break;
-		case EQUIP_CODE_TACTICAL_OBJECT:			SystemName="전술객체 모의기";		break;
-		default:								    SystemName="unknown system Code";	break;
+		case EQUIP_CODE_OPERATION_CONTROL:			SystemName = "운용통제기";			break;
+		case EQUIP_CODE_BATTLEFIELD_DISPLAY:		SystemName = "전장가시화";			break;
+		case EQUIP_CODE_OWNSHIP:					SystemName = "운용함 모의기";			break;
+		case EQUIP_CODE_NEW_HEAVY_TORPEDO:		    SystemName = "차기중어뢰 모의기";		break;
+		case EQUIP_CODE_TARGETSHIP:					SystemName = "표적함 모의기";			break;
+		case EQUIP_CODE_TACTICAL_OBJECT:			SystemName = "전술객체 모의기";		break;
+		default:								    SystemName = "unknown system Code";	break;
 		}
 		return SystemName;
 	}
@@ -154,7 +154,7 @@ public:
 	{
 		double tempMin;
 		double tempDegree;
-		
+
 		if (Second != 0)		tempMin = Minute + (Second / 60);
 		else					tempMin = Minute;
 

@@ -2,7 +2,8 @@
 #include <afxmt.h>
 #include "afxwin.h"
 #include "afxcmn.h"
-
+#include "objectBase.h"
+#include "ObjectMananger.h"
 #include <vector>
 
 //#define NETWORK_MAXSIZE			40000
@@ -55,6 +56,9 @@ public:
 	void readConfigure(void);
 
 public:
+	
+	CObjectMananger m_pObjectManager;
+
 	CNetworkTCPClient *m_pTCPClient;
 	int m_iCurSystemCode;
 	unsigned int m_iTimeStamp;
@@ -89,6 +93,7 @@ public:
 	int m_iCurbufPoolsize;
 	int getBufPoolSize();
 
-
+	void getNetworkMsg(char *msg, void *param);
+	void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData);
 };
 

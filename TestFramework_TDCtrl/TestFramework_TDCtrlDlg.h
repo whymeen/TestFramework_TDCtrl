@@ -27,6 +27,8 @@ public:
 
 public:
 	
+
+	CTestFramework_TDCtrlDlg* pMainDlg;
 	TCPFunc m_TCPfunc;
 
 	int m_iCurObjectID;

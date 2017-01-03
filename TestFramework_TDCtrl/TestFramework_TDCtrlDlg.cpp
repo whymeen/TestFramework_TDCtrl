@@ -894,3 +894,6 @@ void CTestFramework_TDCtrlDlg::OnBnClickedButtonResetAll()
 	m_cvSldVelocity.SetPos(50);
 	m_cvSldDepth.SetPos(50);
 }
+
+
+
