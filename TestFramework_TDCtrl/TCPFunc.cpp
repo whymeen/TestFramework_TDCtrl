@@ -1,29 +1,14 @@
 #include "stdafx.h"
 #include "TCPFunc.h"
+#include "TestFramework_TDCtrl.h"
 #include "TestFramework_TDCtrlDlg.h"
 #include <fstream>
 #include <time.h>
 
 TCPFunc::TCPFunc()
 {
-	m_pTCPClient = NULL;
 
 	m_iCurSystemCode = 2;		// 전장가시화 코드값
-
-	initNetwork();
-
-	// 연결상태 체크
-	//SetTimer(0, 1000, NULL);
-	//SetTimer(1, 10, NULL);
-
-	initBuf();
-	m_ipreRcvSize = 0;
-	m_ichBufIndex = 0;
-
-	// 보간법 관련 버퍼 초기화
-	initBufPool();
-
-	m_dSimTime = 1.01;
 }
 
 
@@ -57,9 +42,9 @@ void TCPFunc::SendEventData(char* packetData, int packetDataSize)
 {
 	char sendBuf[NETWORK_MAXSIZE];
 
-	CODE_HEADER header;
-	memset(&header, 0x00, sizeof(CODE_HEADER));
-	int headsize = sizeof(CODE_HEADER);
+	ICD_HEADER header;
+	memset(&header, 0x00, sizeof(ICD_HEADER));
+	int headsize = sizeof(ICD_HEADER);
 	int totsize = headsize + packetDataSize;
 
 	//header.C_TimeStamp = GetTimeStamp();
@@ -90,9 +75,9 @@ void TCPFunc::SendUpdateData(char* packetData, int packetDataSize)
 {
 	char sendBuf[NETWORK_MAXSIZE];
 
-	CODE_HEADER header;
-	memset(&header, 0x00, sizeof(CODE_HEADER));
-	int headsize = sizeof(CODE_HEADER);
+	ICD_HEADER header;
+	memset(&header, 0x00, sizeof(ICD_HEADER));
+	int headsize = sizeof(ICD_HEADER);
 	int totsize = headsize + packetDataSize;
 
 //	header.C_TimeStamp = GetTimeStamp();
@@ -290,14 +275,14 @@ void TCPFunc::UpdateMsgParser(char *msg)
 	int type = -1;
 	int length = -1;
 
-	CODE_HEADER header;
+	ICD_HEADER header;
 
-	memcpy(&header, &msg[bufIndex], sizeof(CODE_HEADER));
+	memcpy(&header, &msg[bufIndex], sizeof(ICD_HEADER));
 //	iTimeStamp = header.C_TimeStamp;
-	iLength = header.C_Length;
+	iLength = header.H_Length;
 
 
-	bufIndex += sizeof(CODE_HEADER);
+	bufIndex += sizeof(ICD_HEADER);
 
 	unsigned char c, l;
 	memcpy(&c, &msg[bufIndex], 1);
@@ -634,7 +619,7 @@ void TCPFunc::getNetworkMsg(char *msg, void *param)
 
 void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 {
-	CTestFramework_TDCtrlDlg* pMainDlg = (CTestFramework_TDCtrlDlg*)::AfxGetMainWnd();
+	CTestFramework_TDCtrlDlg* pMainDlg = (CTestFramework_TDCtrlDlg*)::AfxGetApp()->GetMainWnd();
 	switch (rcvData->mode)
 	{
 	case OBJECT_CTRL_CREATE:
@@ -677,6 +662,7 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 
 			// GUI 정보 업데이트 [6/15/2010 boxface]
 			//////////////////////////////////////////////////////////////////////////
+			
 			pMainDlg->addObject(rcvData->objectID);
 		}
 		else
@@ -733,7 +719,7 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 
 		// GUI 정보 업데이트 [6/15/2010 boxface]
 		//////////////////////////////////////////////////////////////////////////
-		//pMainDlg->deleteObject(rcvData->objectID);
+		pMainDlg->deleteObject(rcvData->objectID);
 	}
 	break;
 	default:

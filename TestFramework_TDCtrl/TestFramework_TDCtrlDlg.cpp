@@ -90,6 +90,7 @@ void CTestFramework_TDCtrlDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER_HORIZENTAL, m_cvSldHeading);
 	DDX_Control(pDX, IDC_SLIDER_DEPTH, m_cvSldDepth);
 	DDX_Control(pDX, IDC_SLIDER_VERTICAL, m_cvSldVelocity);
+	DDX_Control(pDX, IDC_STATIC_CONN_STATE, m_cvTxtConnStatus);
 }
 
 BEGIN_MESSAGE_MAP(CTestFramework_TDCtrlDlg, CDialogEx)
@@ -110,7 +111,8 @@ BEGIN_MESSAGE_MAP(CTestFramework_TDCtrlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_RESET_DEPTH, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetDepth)
 	ON_BN_CLICKED(IDC_BUTTON_RESET_V, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetV)
 	ON_BN_CLICKED(IDC_BUTTON_RESET_ALL, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetAll)
-	END_MESSAGE_MAP()
+	ON_WM_TIMER()
+END_MESSAGE_MAP()
 
 
 // CTestFramework_TDCtrlDlg 메시지 처리기
@@ -236,6 +238,21 @@ BOOL CTestFramework_TDCtrlDlg::OnInitDialog()
 	m_cvSldHeading.SetPos(50);
 	m_cvSldVelocity.SetPos(50);
 	m_cvSldDepth.SetPos(50);
+
+
+
+	//////네트워크 설정
+
+	m_TCPfunc.m_pTCPClient = NULL;
+	m_TCPfunc.initNetwork();
+
+	SetTimer(0, 1000, NULL);
+	SetTimer(1, 10, NULL);
+
+	m_TCPfunc.initBuf();
+	m_TCPfunc.m_ipreRcvSize = 0;
+	m_TCPfunc.m_ichBufIndex = 0;
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -897,3 +914,38 @@ void CTestFramework_TDCtrlDlg::OnBnClickedButtonResetAll()
 
 
 
+
+
+void CTestFramework_TDCtrlDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	switch (nIDEvent)
+	{
+	case 0:
+	{
+		if (m_TCPfunc.m_pTCPClient == NULL)
+		{
+			return;
+		}
+
+		if (m_TCPfunc.m_pTCPClient->getConnectionState() == true)
+		{
+			m_cvTxtConnStatus.SetWindowText("TCP Connection State : Connected");
+		}
+		else
+		{
+			m_cvTxtConnStatus.SetWindowText("TCP Connection State : DisConnected");
+		}
+
+	}
+	break;
+	case 1:
+	{
+
+	}
+	break;
+	default:
+		break;
+	}
+	CDialogEx::OnTimer(nIDEvent);
+}

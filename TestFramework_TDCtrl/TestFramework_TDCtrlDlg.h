@@ -27,8 +27,7 @@ public:
 
 public:
 	
-
-	CTestFramework_TDCtrlDlg* pMainDlg;
+	CNetworkTCPClient *m_pTCPClient;
 	TCPFunc m_TCPfunc;
 
 	int m_iCurObjectID;
@@ -68,6 +67,8 @@ public:
 	CSliderCtrl m_cvSldDepth;
 	CSliderCtrl m_cvSldVelocity;
 
+	CStatic m_cvTxtConnStatus;
+
 // 구현입니다.
 protected:
 	HICON m_hIcon;
@@ -97,4 +98,5 @@ public:
 	afx_msg void OnBnClickedButtonResetV();
 	afx_msg void OnBnClickedButtonResetAll();
 
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

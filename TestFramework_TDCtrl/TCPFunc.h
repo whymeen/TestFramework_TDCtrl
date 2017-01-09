@@ -38,8 +38,6 @@ public:
 	void SendEventData(char* packetData, int packetDataSize);
 	void SendUpdateData(char* packetData, int packetDataSize);
 
-	void process();
-
 	void close();
 
 	void recordMsg(CString cstmp);
