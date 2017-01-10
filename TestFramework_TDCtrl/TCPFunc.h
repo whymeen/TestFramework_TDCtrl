@@ -1,10 +1,11 @@
 #include "dhTCP/networktcpclient.h"
 #include <afxmt.h>
+#include <vector>
 #include "afxwin.h"
 #include "afxcmn.h"
 #include "objectBase.h"
 #include "ObjectMananger.h"
-#include <vector>
+#include "ThreadFunc.h"
 
 //#define NETWORK_MAXSIZE			40000
 #define FRAME_30HZ				33
@@ -35,37 +36,31 @@ public:
 	void initNetwork();		// 네트워크 초기화
 	void initBuf();
 
+
 	void SendEventData(char* packetData, int packetDataSize);
 	void SendUpdateData(char* packetData, int packetDataSize);
 
 	void close();
 
-	void recordMsg(CString cstmp);
-	//void recordMsg1(CString cstmp);
-
 	int GetTimeStamp() { return m_iTimeStamp; }
 
-	void EventMsgParser(char *msg, int dataSize);		// 네트워크정보 수신정보 처리
-	void UpdateMsgParser(char *msg);					// 네트워크정보 수신 함수
-
 	static void getUpdateMsg(char *msg, void *param);	// 네트워크정보 수신 함수
-	static void getEventMsg(char *msg, void *param, int dataSize);	// 네트워크정보 수신 함수
 
 	void readConfigure(void);
 
-public:
-	
-	CObjectMananger m_pObjectManager;
+	static TCPFunc* getinstance() { return m_instance; }	// MainFrame 인스턴스 반환함수
 
+public:
+	ThreadFunc m_Thread;
+	static TCPFunc*	m_instance;
+	CObjectMananger m_pObjectManager;
 	CNetworkTCPClient *m_pTCPClient;
 	int m_iCurSystemCode;
 	unsigned int m_iTimeStamp;
 	CString m_cstmp;
 
 	CStatic m_cvTxtConnStatus;
-
-	CListBox m_cvListMsg;
-
+	
 	char m_chBuf[NETWORK_MAXSIZE + 10000];
 	int m_ichBufIndex;
 	int m_ipreRcvSize;
@@ -83,7 +78,7 @@ public:
 
 	void initBufPool();
 	void updateBufPool(PosData *curPos);
-	int getCurPos(double interTime, PosData *InterPos);
+
 
 
 	bool getCheckTimeRange(double curTime);
@@ -91,7 +86,11 @@ public:
 	int m_iCurbufPoolsize;
 	int getBufPoolSize();
 
-	void getNetworkMsg(char *msg, void *param);
-	void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData);
+	void onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData);
+
+	void onTorpedoAdd(int parentID, SUB_OBJECT_INFO* rcvData);
+	void onDecoyAdd(int parentID, SUB_OBJECT_INFO* rcvData);
+
+	void onSimulationCtrl(EVENT_SIMULATION_CONTROL* rcvData);
 };
 

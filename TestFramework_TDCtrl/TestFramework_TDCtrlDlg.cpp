@@ -97,7 +97,6 @@ BEGIN_MESSAGE_MAP(CTestFramework_TDCtrlDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_CBN_SELENDCANCEL(IDC_COMBO_OBJECTID, &CTestFramework_TDCtrlDlg::OnCbnSelendcancelComboObjectid)
 	ON_BN_CLICKED(IDC_BUTTON_FIRE, &CTestFramework_TDCtrlDlg::OnBnClickedButtonFire)
 	ON_BN_CLICKED(IDC_BUTTON_DECOY_FIRE, &CTestFramework_TDCtrlDlg::OnBnClickedButtonDecoyFire)
 	ON_BN_CLICKED(IDC_BUTTON_TORPEDO_PRESET, &CTestFramework_TDCtrlDlg::OnBnClickedButtonTorpedoPreset)
@@ -112,6 +111,8 @@ BEGIN_MESSAGE_MAP(CTestFramework_TDCtrlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_RESET_V, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetV)
 	ON_BN_CLICKED(IDC_BUTTON_RESET_ALL, &CTestFramework_TDCtrlDlg::OnBnClickedButtonResetAll)
 	ON_WM_TIMER()
+ON_CBN_SELCHANGE(IDC_COMBO_TORPEDOID, &CTestFramework_TDCtrlDlg::OnCbnSelchangeComboTorpedoid)
+ON_CBN_SELCHANGE(IDC_COMBO_OBJECTID, &CTestFramework_TDCtrlDlg::OnCbnSelchangeComboObjectid)
 END_MESSAGE_MAP()
 
 
@@ -147,7 +148,6 @@ BOOL CTestFramework_TDCtrlDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	
-
 	// 초기 값 설정
 
 	m_iCurObjectID = 0;
@@ -250,8 +250,6 @@ BOOL CTestFramework_TDCtrlDlg::OnInitDialog()
 	SetTimer(1, 10, NULL);
 
 	m_TCPfunc.initBuf();
-	m_TCPfunc.m_ipreRcvSize = 0;
-	m_TCPfunc.m_ichBufIndex = 0;
 
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -304,71 +302,6 @@ void CTestFramework_TDCtrlDlg::OnPaint()
 HCURSOR CTestFramework_TDCtrlDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
-}
-
-
-
-void CTestFramework_TDCtrlDlg::OnCbnSelendcancelComboObjectid()
-{
-	// 초기화 [7/29/2010 boxface]
-	m_cvCbxTorpedoIDList.ResetContent();
-	m_cvCbxDecoyList.ResetContent();
-
-	// 플랫폼 ID 선택 [7/29/2010 boxface]
-	CString cstmp;
-	m_cvCbxObjectID.GetLBText(m_cvCbxObjectID.GetCurSel(), cstmp);
-	m_iCurObjectID = atoi(cstmp);
-
-
-	int i, count = m_pObjectManager.m_ObjectList.size();
-	for (i = 0; i<count; i++)
-	{
-		// 플랫폼 ID에 포함된 어뢰정보 획득 [7/29/2010 boxface]
-		if (m_pObjectManager.m_ObjectList[i].getObjectID() != m_iCurObjectID)
-		{
-			continue;
-		}
-
-		// 탑제된 어뢰정보를 리스트에 추가 [8/3/2010 boxface]
-		int j, count0 = m_pObjectManager.m_ObjectList[i].m_vTorpedoList.size();
-		for (j = 0; j<count0; j++)
-		{
-			if (m_pObjectManager.m_ObjectList[i].m_vTorpedoList[j].bFired == true)
-			{
-				continue;
-			}
-
-			cstmp.Format("%d", m_pObjectManager.m_ObjectList[i].m_vTorpedoList[j].iObjectID);
-			m_cvCbxTorpedoIDList.AddString(cstmp);
-		}
-		m_cvCbxTorpedoIDList.SetCurSel(0);
-
-		// 탑제된 기만기 정보를 리스트에 추가 [8/3/2010 boxface]
-		int count1 = m_pObjectManager.m_ObjectList[i].m_vDecoyList.size();
-		for (j = 0; j<count1; j++)
-		{
-			if (m_pObjectManager.m_ObjectList[i].m_vDecoyList[j].bFired == true)
-			{
-				continue;
-			}
-
-			cstmp.Format("%d", m_pObjectManager.m_ObjectList[i].m_vDecoyList[j].iObjectID);
-			m_cvCbxDecoyList.AddString(cstmp);
-		}
-		m_cvCbxDecoyList.SetCurSel(0);
-
-		if (m_pObjectManager.m_ObjectList[i].getObjectType() == OBJECT_TYPE_TORPEDO ||
-			m_pObjectManager.m_ObjectList[i].getObjectType() == OBJECT_TYPE_DECOY)
-		{
-			m_cvCbxTorpedoIDList.EnableWindow(false);
-			m_cvCbxDecoyList.EnableWindow(false);
-		}
-		else
-		{
-			m_cvCbxTorpedoIDList.EnableWindow(true);
-			m_cvCbxDecoyList.EnableWindow(true);
-		}
-	}
 }
 
 
@@ -948,4 +881,75 @@ void CTestFramework_TDCtrlDlg::OnTimer(UINT_PTR nIDEvent)
 		break;
 	}
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+
+void CTestFramework_TDCtrlDlg::OnCbnSelchangeComboTorpedoid()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CTestFramework_TDCtrlDlg::OnCbnSelchangeComboObjectid()
+{
+	// 초기화 [7/29/2010 boxface]
+	m_cvCbxTorpedoIDList.ResetContent();
+	m_cvCbxDecoyList.ResetContent();
+
+	// 플랫폼 ID 선택 [7/29/2010 boxface]
+	CString cstmp;
+	m_cvCbxObjectID.GetLBText(m_cvCbxObjectID.GetCurSel(), cstmp);
+	m_iCurObjectID = atoi(cstmp);
+
+
+	int i, count = m_pObjectManager.m_ObjectList.size();
+	for (i = 0; i<count; i++)
+	{
+		// 플랫폼 ID에 포함된 어뢰정보 획득 [7/29/2010 boxface]
+		if (m_pObjectManager.m_ObjectList[i].getObjectID() != m_iCurObjectID)
+		{
+			continue;
+		}
+
+		// 탑제된 어뢰정보를 리스트에 추가 [8/3/2010 boxface]
+		int j, count0 = m_pObjectManager.m_ObjectList[i].m_vTorpedoList.size();
+		for (j = 0; j<count0; j++)
+		{
+			if (m_pObjectManager.m_ObjectList[i].m_vTorpedoList[j].bFired == true)
+			{
+				continue;
+			}
+
+			cstmp.Format("%d", m_pObjectManager.m_ObjectList[i].m_vTorpedoList[j].iObjectID);
+			m_cvCbxTorpedoIDList.AddString(cstmp);
+		}
+		m_cvCbxTorpedoIDList.SetCurSel(0);
+
+		// 탑제된 기만기 정보를 리스트에 추가 [8/3/2010 boxface]
+		int count1 = m_pObjectManager.m_ObjectList[i].m_vDecoyList.size();
+		for (j = 0; j<count1; j++)
+		{
+			if (m_pObjectManager.m_ObjectList[i].m_vDecoyList[j].bFired == true)
+			{
+				continue;
+			}
+
+			cstmp.Format("%d", m_pObjectManager.m_ObjectList[i].m_vDecoyList[j].iObjectID);
+			m_cvCbxDecoyList.AddString(cstmp);
+		}
+		m_cvCbxDecoyList.SetCurSel(0);
+
+		if (m_pObjectManager.m_ObjectList[i].getObjectType() == OBJECT_TYPE_TORPEDO ||
+			m_pObjectManager.m_ObjectList[i].getObjectType() == OBJECT_TYPE_DECOY)
+		{
+			m_cvCbxTorpedoIDList.EnableWindow(false);
+			m_cvCbxDecoyList.EnableWindow(false);
+		}
+		else
+		{
+			m_cvCbxTorpedoIDList.EnableWindow(true);
+			m_cvCbxDecoyList.EnableWindow(true);
+		}
+	}
 }

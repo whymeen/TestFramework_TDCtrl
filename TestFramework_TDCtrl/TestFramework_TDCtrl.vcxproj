@@ -204,7 +204,6 @@
     <ClInclude Include="TubeAssignmentDlg.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConnectSocket.cpp" />
     <ClCompile Include="objectBase.cpp" />
     <ClCompile Include="ObjectMananger.cpp" />
     <ClCompile Include="stdafx.cpp">

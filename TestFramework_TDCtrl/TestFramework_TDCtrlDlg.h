@@ -80,7 +80,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnCbnSelendcancelComboObjectid();
+//	afx_msg void OnCbnSelendcancelComboObjectid();
 	afx_msg void OnBnClickedButtonFire();
 	afx_msg void OnBnClickedButtonDecoyFire();
 	afx_msg void OnBnClickedButtonTorpedoPreset();
@@ -99,4 +99,7 @@ public:
 	afx_msg void OnBnClickedButtonResetAll();
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+//	afx_msg void OnCbnSelendcancelComboTorpedoid();
+	afx_msg void OnCbnSelchangeComboTorpedoid();
+	afx_msg void OnCbnSelchangeComboObjectid();
 };

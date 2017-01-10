@@ -4,18 +4,17 @@
 #include "TestFramework_TDCtrlDlg.h"
 #include <fstream>
 #include <time.h>
+#include "ThreadFunc.h"
 
-TCPFunc::TCPFunc()
+TCPFunc::TCPFunc(void)
 {
-
-	m_iCurSystemCode = 2;		// 전장가시화 코드값
+	m_iCurSystemCode = 2;
+	// 전장가시화 코드값
 }
 
-
-TCPFunc::~TCPFunc()
+TCPFunc::~TCPFunc(void)
 {
 }
-
 
 void TCPFunc::initNetwork()
 {
@@ -25,17 +24,17 @@ void TCPFunc::initNetwork()
 	//m_pTCPClient = new CNetworkTCPClient(iip , port1);
 	m_pTCPClient = new CNetworkTCPClient("127.0.0.1", 5100);
 	m_pTCPClient->addCallback(getUpdateMsg, this);
-
-
 	initBuf();
 }
 
 void TCPFunc::initBuf()
 {
+	//memset(m_networkDataBuf, 0x00, 1000 * NETWORK_MAXSIZE);
+	//memset(m_networkDataFlag, 0x00, sizeof(int) * 1000);
+	//memset(m_networkTTSN, 0x00, sizeof(int) * 1000);
 	m_ichBufIndex = 0;		// 받은정보중 데이터가 있는부분
 	m_ipreRcvSize = 0;		// 다음 패킷 받을때 붙여야 할 부분
-
-	memset(&m_chBuf, 0x00, NETWORK_MAXSIZE);
+    memset(&m_chBuf, 0x00, NETWORK_MAXSIZE);
 }
 
 void TCPFunc::SendEventData(char* packetData, int packetDataSize)
@@ -56,7 +55,7 @@ void TCPFunc::SendEventData(char* packetData, int packetDataSize)
 	//header.C_TImeSec = 22;
 	//header.C_TImeMSec = 111;
 
-	memcpy(&sendBuf, (char*)&header, headsize);						// 헤더 붙이기 
+	memcpy(&sendBuf, (char*)&header, headsize);						// 헤더 붙이기
 	memcpy(&sendBuf[headsize], (char*)packetData, packetDataSize);		// 데이터 불이기
 
 																		//	dhPrint("packet size => H:%d, D:%d => total:%d, time:%d\n", headsize, packetDataSize, totsize, sizeof(header.H_Timestamp));
@@ -80,11 +79,11 @@ void TCPFunc::SendUpdateData(char* packetData, int packetDataSize)
 	int headsize = sizeof(ICD_HEADER);
 	int totsize = headsize + packetDataSize;
 
-//	header.C_TimeStamp = GetTimeStamp();
-//	header.C_Length = totsize;
-//	header.C_SenderCode = m_iCurSystemCode;
+	//	header.C_TimeStamp = GetTimeStamp();
+	//	header.C_Length = totsize;
+	//	header.C_SenderCode = m_iCurSystemCode;
 
-	memcpy(&sendBuf, (char*)&header, headsize);						// 헤더 붙이기 
+	memcpy(&sendBuf, (char*)&header, headsize);						// 헤더 붙이기
 	memcpy(&sendBuf[headsize], (char*)packetData, packetDataSize);		// 데이터 불이기
 
 																		//	dhPrint("packet size => H:%d, D:%d => total:%d, time:%d\n", headsize, packetDataSize, totsize, sizeof(header.H_Timestamp));
@@ -101,32 +100,22 @@ void TCPFunc::SendUpdateData(char* packetData, int packetDataSize)
 	}
 }
 
-void TCPFunc::getEventMsg(char *msg, void *param, int dataSize)
-{
-	TCPFunc *pMF = (TCPFunc *)param;
-
-	if (dataSize < 0 || pMF == NULL)
-	{
-		return;
-	}
-
-	pMF->EventMsgParser(msg, dataSize);
-}
-
 void TCPFunc::getUpdateMsg(char *msg, void *param)
 {
+	TRACE("파서 호출 \n");
+	
 	TCPFunc *pMF = (TCPFunc *)param;
 
-	//pMF->UpdateMsgParser(msg);
+
 	int bufIndex = 0;
 	double dTimeStamp = 0;
 	int iLength = 0;
 	int type = -1;
 	int length = -1;
+	
+	ICD_HEADER header;
 
-	_ICD_HEADER header;
-
-	memcpy(&header, &msg[bufIndex], sizeof(_ICD_HEADER));
+	memcpy(&header, &msg[bufIndex], sizeof(ICD_HEADER));
 	dTimeStamp = header.H_Timestamp;
 	iLength = header.H_Length;
 
@@ -136,9 +125,9 @@ void TCPFunc::getUpdateMsg(char *msg, void *param)
 		return;
 	}
 
-	//dhPrint("iTimeStamp:%lf, iLength:%d\n", dTimeStamp, iLength);
+	TRACE("iTimeStamp:%lf, iLength:%d\n", dTimeStamp, iLength);
 
-	bufIndex += sizeof(_ICD_HEADER);
+	bufIndex += sizeof(ICD_HEADER);
 
 	unsigned char c, l;
 	memcpy(&c, &msg[bufIndex], 1);
@@ -160,18 +149,17 @@ void TCPFunc::getUpdateMsg(char *msg, void *param)
 		memset(&rcvData, 0x00, sizeof(EVENT_SIMULATION_CONTROL));
 		memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_SIMULATION_CONTROL));
 
-		//pMF->onSimulationCtrl(&rcvData);
+		pMF->onSimulationCtrl(&rcvData);
 
 		bufIndex += sizeof(EVENT_SIMULATION_CONTROL);
 
 		//////////////////////////////////////////////////////////////////////////
-		//dhPrint("type:%#x, length:%d, control_code:%d, simspeed:%d\n", rcvData.type, rcvData.length, rcvData.control_code, rcvData.simspeed);
+		TRACE("type:%#x, length:%d, control_code:%d:%d\n", rcvData.type, rcvData.length, rcvData.control_code);
 	}
 	break;
 	// 객체설정 [8/12/2010 boxface]
 	case MSG_CODE_EVENT_OBJECT_SETUP_0x12:
 	{
-
 		// 수신된 정보 처리 [7/6/2010 boxface]
 		//////////////////////////////////////////////////////////////////////////
 		EVENT_OBJECT_CONTROL rcvData;
@@ -183,152 +171,67 @@ void TCPFunc::getUpdateMsg(char *msg, void *param)
 		bufIndex += sizeof(EVENT_OBJECT_CONTROL);
 
 		//////////////////////////////////////////////////////////////////////////
-		//dhPrint("type:%#x, length:%d, objectID:%d, objectType:%d\n", rcvData.type, rcvData.length, rcvData.objectID, rcvData.objectType);
-		//dhPrint("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
+		TRACE("type:%#x, length:%d, objectID:%d, objectType:%d\n", rcvData.type, rcvData.length, rcvData.objectID, rcvData.objectType);
+		//TRACE("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
+	}
+	break;
+	// 어뢰무장설정
+	TRACE("어뢰 무장 설정 \n");
+	case MSG_CODE_EVENT_TORPEDO_SETUP_0x13:
+	{
+	// 수신된 정보 처리 
+	//////////////////////////////////////////////////////////////////////////
+	EVENT_TORPEDO_SETUP rcvData;
+	memset(&rcvData, 0x00, sizeof(EVENT_TORPEDO_SETUP));
+	memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_TORPEDO_SETUP));
+
+	SUB_OBJECT_INFO rcvData0;
+	memset(&rcvData0, 0x00, sizeof(SUB_OBJECT_INFO));
+	rcvData0.objectID = rcvData.objectID;
+	rcvData0.imageType = rcvData.imageType;
+	if (rcvData.torpedoType == 0)		rcvData0.objectType = OBJECT_TYPE_TORPEDO;
+	else								rcvData0.objectType = OBJECT_TYPE_TORPEDO;
+
+	pMF->onTorpedoAdd(rcvData.parentID, &rcvData0);
+
+	bufIndex += sizeof(EVENT_TORPEDO_SETUP);
+
+	//////////////////////////////////////////////////////////////////////////
+	TRACE("type:%#x, length:%d, objectID:%d \n", rcvData.type, rcvData.length, rcvData.objectID);
+	//TRACE("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
+	}
+	break;
+	// 기만기설정 [8/12/2010 boxface]
+	TRACE("기만기 설정 \n");
+	case MSG_CODE_EVENT_DECOY_SETUP_0x14:
+	{
+	// 수신된 정보 처리 [7/6/2010 boxface]
+	//////////////////////////////////////////////////////////////////////////
+	EVENT_DECOY_SETUP rcvData;
+	memset(&rcvData, 0x00, sizeof(EVENT_DECOY_SETUP));
+	memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_DECOY_SETUP));
+
+	SUB_OBJECT_INFO rcvData0;
+	memset(&rcvData0, 0x00, sizeof(SUB_OBJECT_INFO));
+	rcvData0.objectID = rcvData.objectID;
+	rcvData0.imageType = rcvData.imageType;
+	if (rcvData.decoyType == 0)		rcvData0.objectType = OBJECT_TYPE_DECOY;
+	else							rcvData0.objectType = OBJECT_TYPE_DECOY;
+
+	pMF->onDecoyAdd(rcvData.parentID, &rcvData0);
+
+	bufIndex += sizeof(EVENT_DECOY_SETUP);
+
+	//////////////////////////////////////////////////////////////////////////
+	//dhPrint("type:%#x, length:%d, objectID:%d\n", rcvData.type, rcvData.length, rcvData.objectID);
+	//dhPrint("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
 	}
 	break;
 	}
-
-}
-
-void TCPFunc::EventMsgParser(char *msg, int dataSize)		// 네트워크정보 수신정보 처리
-{
-
-	int bufIndex = 0;
-	double dTimeStamp = 0;
-	int iLength = 0;
-	int type = -1;
-	int length = -1;
-
-	_ICD_HEADER header;
-
-	memcpy(&header, &msg[bufIndex], sizeof(_ICD_HEADER));
-	dTimeStamp = header.H_Timestamp;
-	iLength = header.H_Length;
-
-	if (header.H_Sender_Equip_Code == m_iCurSystemCode)
-	{
-		//dhPrint("내가 보낸 정보를 수신하였다. !!\n");
-		return;
-	}
-
-	//dhPrint("iTimeStamp:%lf, iLength:%d\n", dTimeStamp, iLength);
-
-	bufIndex += sizeof(_ICD_HEADER);
-
-	unsigned char c, l;
-	memcpy(&c, &msg[bufIndex], 1);
-	memcpy(&l, &msg[bufIndex + 1], 1);
-
-	type = c;
-	length = l;
-
-	switch (type)
-	{
-		// 시뮬레이션 제어 [8/12/2010 boxface]
-	case MSG_CODE_EVENT_SIMULATION_CONTROL_0x11:
-	{
-		//////////////////////////////////////////////////////////////////////////
-
-		// 수신된 정보 처리 [7/6/2010 boxface]
-		//////////////////////////////////////////////////////////////////////////
-		EVENT_SIMULATION_CONTROL rcvData;
-		memset(&rcvData, 0x00, sizeof(EVENT_SIMULATION_CONTROL));
-		memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_SIMULATION_CONTROL));
-
-		//pMF->onSimulationCtrl(&rcvData);
-
-		bufIndex += sizeof(EVENT_SIMULATION_CONTROL);
-
-		//////////////////////////////////////////////////////////////////////////
-		//dhPrint("type:%#x, length:%d, control_code:%d, simspeed:%d\n", rcvData.type, rcvData.length, rcvData.control_code, rcvData.simspeed);
-	}
-	break;
-	// 객체설정 [8/12/2010 boxface]
-	case MSG_CODE_EVENT_OBJECT_SETUP_0x12:
-	{
-
-		// 수신된 정보 처리 [7/6/2010 boxface]
-		//////////////////////////////////////////////////////////////////////////
-		EVENT_OBJECT_CONTROL rcvData;
-		memset(&rcvData, 0x00, sizeof(EVENT_OBJECT_CONTROL));
-		memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_OBJECT_CONTROL));
-
-		onObjectCtrl(&rcvData);
-
-		bufIndex += sizeof(EVENT_OBJECT_CONTROL);
-
-		//////////////////////////////////////////////////////////////////////////
-		//dhPrint("type:%#x, length:%d, objectID:%d, objectType:%d\n", rcvData.type, rcvData.length, rcvData.objectID, rcvData.objectType);
-		//dhPrint("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
-	}
-	break;
-	}
-}
-
-void TCPFunc::UpdateMsgParser(char *msg)
-{
-	CString cstmp;
-	int bufIndex = 0;
-	int iTimeStamp = 0;
-	int iLength = 0;
-	int type = -1;
-	int length = -1;
-
-	ICD_HEADER header;
-
-	memcpy(&header, &msg[bufIndex], sizeof(ICD_HEADER));
-//	iTimeStamp = header.C_TimeStamp;
-	iLength = header.H_Length;
-
-
-	bufIndex += sizeof(ICD_HEADER);
-
-	unsigned char c, l;
-	memcpy(&c, &msg[bufIndex], 1);
-	memcpy(&l, &msg[bufIndex + 1], 1);
-
-	type = c;
-	length = l;
-
-	//TRACE("update message 신호 수신 [%d] type:[%#x], length:[%d]\n",iTimeStamp, type, length);
-
-/*	switch (type)
-	{
-		// bit 신호 
-	case _S2VDS_EVENT_GUIDEDMISSILE_OBJECT_SETUP_0x22:
-	{
-
-	}
-	break;
-	case _S2VDS_EVENT_GENERAL_OBJECT_SETUP_0x21:
-	{
-		S2VDS_EVENT_GENERAL_OBJECT_SETUP rcvData;
-		memset(&rcvData, 0x00, sizeof(S2VDS_EVENT_GENERAL_OBJECT_SETUP));
-		memcpy(&rcvData, &msg[bufIndex], sizeof(S2VDS_EVENT_GENERAL_OBJECT_SETUP));
-
-		PosData curPos;
-		memset(&curPos, 0x00, sizeof(PosData));
-
-		curPos.time = iTimeStamp;
-		curPos.x = rcvData.latitude;
-
-		updateBufPool(&curPos);
-		//cstmp.Format("MSG_CODE_UPDATE_OBJECT_CONTROL_0x21 [%d] type:[%#x], length:[%d], name[%s]\n", iTimeStamp, type, length, rcvData.Object_Name);
-		cstmp.Format("S2VDS_EVENT_GENERAL_OBJECT_SETUP [%d] deg[%f] sin[%3.1f]=%f\n", iTimeStamp, rcvData.latitude, rcvData.latitude, rcvData.longitude);
-		recordMsg(cstmp);
-	}
-	break;
-	default:
-		cstmp.Format("unknown message 신호 수신 type:[%#x], length:[%d]\n", type, length);
-		recordMsg(cstmp);
-		break;
-	}*/
 }
 
 void TCPFunc::close()
 {
-
 	// 타이머 종료
 //	KillTimer(0);
 //	KillTimer(1);
@@ -340,17 +243,11 @@ void TCPFunc::close()
 	m_pTCPClient = NULL;
 }
 
-void TCPFunc::recordMsg(CString cstmp)
-{
-	m_cvListMsg.InsertString(0, cstmp);
-}
-
 void TCPFunc::initBufPool()
 {
 	memset(m_stBufPool, 0x00, sizeof(PosData) * 5);
 	memset(m_bBufPoolFlag, 0x00, sizeof(bool) * 5);
 	m_iCurbufPoolsize = 0;
-
 
 	m_vListData.clear();
 }
@@ -359,7 +256,7 @@ int TCPFunc::getBufPoolSize()
 {
 	m_iCurbufPoolsize = 0;
 
-	for (int i = 0; i<5; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		if (m_bBufPoolFlag[i] == 1)
 		{
@@ -384,7 +281,7 @@ bool TCPFunc::getCheckTimeRange(double curTime)
 void TCPFunc::updateBufPool(PosData *curPos)
 {
 	int i;
-	for (i = 0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		m_bBufPoolFlag[i] = m_bBufPoolFlag[i + 1];
 		m_stBufPool[i].time = m_stBufPool[i + 1].time;
@@ -410,46 +307,6 @@ void TCPFunc::updateBufPool(PosData *curPos)
 	m_vListData.push_back(*curPos);
 }
 
-
-int TCPFunc::getCurPos(double interTime, PosData *InterPos)
-{
-	CString cstmp;
-
-	if (getBufPoolSize() < 5)
-	{
-		cstmp.Format("아직 버퍼가 차지않았다. [%d]\n", getBufPoolSize());
-		recordMsg(cstmp);
-		return 0;
-	}
-
-	if (getCheckTimeRange(interTime) == false)
-	{
-		cstmp.Format("보간범위를 벗어난다 [%f] => [%d ~ %d]\n", interTime, m_stBufPool[0].time, m_stBufPool[4].time);
-		recordMsg(cstmp);
-		return -1;
-	}
-
-	double eT[5], eX[5];
-	double intpx, intpDx;
-
-	for (int i = 0; i <5; i++)
-	{
-		eT[i] = m_stBufPool[i].time;
-		eX[i] = m_stBufPool[i].x;
-	}
-
-	InterPos->time = interTime;
-
-	InterPos->x = intpx;
-	InterPos->y = 0;
-	InterPos->z = 0;
-	InterPos->h = 0;
-	InterPos->p = 0;
-	InterPos->r = 0;
-
-	return 1;
-}
-
 void TCPFunc::readConfigure(void)
 {
 	FILE *fp = fopen("configa.cfg", "r");
@@ -472,151 +329,6 @@ void TCPFunc::readConfigure(void)
 	}
 }
 
-
-void TCPFunc::getNetworkMsg(char *msg, void *param)
-{
-	TCPFunc *pMF = (TCPFunc *)param;
-
-	int bufIndex = 0;
-	double dTimeStamp = 0;
-	int iLength = 0;
-	int type = -1;
-	int length = -1;
-
-	_ICD_HEADER header;
-
-	memcpy(&header, &msg[bufIndex], sizeof(_ICD_HEADER));
-	dTimeStamp = header.H_Timestamp;
-	iLength = header.H_Length;
-
-	if (header.H_Sender_Equip_Code == pMF->m_iCurSystemCode)
-	{
-		//dhPrint("내가 보낸 정보를 수신하였다. !!\n");
-		return;
-	}
-
-	//dhPrint("iTimeStamp:%lf, iLength:%d\n", dTimeStamp, iLength);
-
-	bufIndex += sizeof(_ICD_HEADER);
-
-	unsigned char c, l;
-	memcpy(&c, &msg[bufIndex], 1);
-	memcpy(&l, &msg[bufIndex + 1], 1);
-
-	type = c;
-	length = l;
-
-	switch (type)
-	{
-		// 시뮬레이션 제어 [8/12/2010 boxface]
-	case MSG_CODE_EVENT_SIMULATION_CONTROL_0x11:
-	{
-		//////////////////////////////////////////////////////////////////////////
-
-		// 수신된 정보 처리 [7/6/2010 boxface]
-		//////////////////////////////////////////////////////////////////////////
-		EVENT_SIMULATION_CONTROL rcvData;
-		memset(&rcvData, 0x00, sizeof(EVENT_SIMULATION_CONTROL));
-		memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_SIMULATION_CONTROL));
-
-		//pMF->onSimulationCtrl(&rcvData);
-
-		bufIndex += sizeof(EVENT_SIMULATION_CONTROL);
-
-		//////////////////////////////////////////////////////////////////////////
-		//dhPrint("type:%#x, length:%d, control_code:%d, simspeed:%d\n", rcvData.type, rcvData.length, rcvData.control_code, rcvData.simspeed);
-	}
-	break;
-	// 객체설정 [8/12/2010 boxface]
-	case MSG_CODE_EVENT_OBJECT_SETUP_0x12:
-	{
-
-		// 수신된 정보 처리 [7/6/2010 boxface]
-		//////////////////////////////////////////////////////////////////////////
-		EVENT_OBJECT_CONTROL rcvData;
-		memset(&rcvData, 0x00, sizeof(EVENT_OBJECT_CONTROL));
-		memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_OBJECT_CONTROL));
-
-		pMF->onObjectCtrl(&rcvData);
-
-		bufIndex += sizeof(EVENT_OBJECT_CONTROL);
-
-		//////////////////////////////////////////////////////////////////////////
-		//dhPrint("type:%#x, length:%d, objectID:%d, objectType:%d\n", rcvData.type, rcvData.length, rcvData.objectID, rcvData.objectType);
-		//dhPrint("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
-	}
-	break;
-	// 어뢰무장설정 [8/12/2010 boxface]
-	/*case MSG_CODE_EVENT_TORPEDO_SETUP_0x14:
-	{
-	// ack 신호 송신 [7/6/2010 boxface]
-	//////////////////////////////////////////////////////////////////////////
-	pMF->SendAckMsg(dTimeStamp);
-	//////////////////////////////////////////////////////////////////////////
-
-	// 수신된 정보 처리 [7/6/2010 boxface]
-	//////////////////////////////////////////////////////////////////////////
-	EVENT_TORPEDO_SETUP rcvData;
-	memset(&rcvData, 0x00, sizeof(EVENT_TORPEDO_SETUP));
-	memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_TORPEDO_SETUP));
-
-	SUB_OBJECT_INFO rcvData0;
-	memset(&rcvData0, 0x00, sizeof(SUB_OBJECT_INFO));
-	rcvData0.objectID = rcvData.objectID;
-	rcvData0.imageType = rcvData.imageType;
-	if (rcvData.torpedoType == 0)		rcvData0.objectType = OBJECT_TYPE_TORPEDO;
-	else								rcvData0.objectType = OBJECT_TYPE_TORPEDO;
-
-	pMF->onTorpedoAdd(rcvData.parentID, &rcvData0);
-
-	bufIndex += sizeof(EVENT_TORPEDO_SETUP);
-
-	//////////////////////////////////////////////////////////////////////////
-	dhPrint("type:%#x, length:%d, objectID:%d \n", rcvData.type, rcvData.length, rcvData.objectID);
-	//dhPrint("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
-	}
-	break;
-	// 기만기설정 [8/12/2010 boxface]
-	case MSG_CODE_EVENT_DECOY_SETUP_0x15:
-	{
-	// ack 신호 송신 [7/6/2010 boxface]
-	//////////////////////////////////////////////////////////////////////////
-	pMF->SendAckMsg(dTimeStamp);
-	//////////////////////////////////////////////////////////////////////////
-
-	// 수신된 정보 처리 [7/6/2010 boxface]
-	//////////////////////////////////////////////////////////////////////////
-	EVENT_DECOY_SETUP rcvData;
-	memset(&rcvData, 0x00, sizeof(EVENT_DECOY_SETUP));
-	memcpy(&rcvData, &msg[bufIndex], sizeof(EVENT_DECOY_SETUP));
-
-	SUB_OBJECT_INFO rcvData0;
-	memset(&rcvData0, 0x00, sizeof(SUB_OBJECT_INFO));
-	rcvData0.objectID = rcvData.objectID;
-	rcvData0.imageType = rcvData.imageType;
-	if (rcvData.decoyType == 0)		rcvData0.objectType = OBJECT_TYPE_DECOY;
-	else							rcvData0.objectType = OBJECT_TYPE_DECOY;
-
-	pMF->onDecoyAdd(rcvData.parentID, &rcvData0);
-
-	bufIndex += sizeof(EVENT_DECOY_SETUP);
-
-	//////////////////////////////////////////////////////////////////////////
-	dhPrint("type:%#x, length:%d, objectID:%d\n", rcvData.type, rcvData.length, rcvData.objectID);
-	//dhPrint("x:%f, y:%f, z:%f, h:%f, p:%f, r:%f\n", rcvData.x, rcvData.y, rcvData.z, rcvData.h, rcvData.p, rcvData.r);
-	}
-	break;
-	// 센서설정 [8/12/2010 boxface]
-	default:
-	dhPrint("unknown message 신호 수신 type[%d], length:[%d]\n", type, length);
-	break;*/
-	}
-}
-
-
-
-
-
 void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 {
 	CTestFramework_TDCtrlDlg* pMainDlg = (CTestFramework_TDCtrlDlg*)::AfxGetApp()->GetMainWnd();
@@ -624,6 +336,7 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 	{
 	case OBJECT_CTRL_CREATE:
 	{
+		
 		CObjectBase pObject;
 
 		pObject.setObjectID(rcvData->objectID);
@@ -632,8 +345,6 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 		pObject.setIFF(rcvData->IFF);
 
 		double x, y, z, h, p, r;
-
-
 
 		x = rcvData->x;
 		y = rcvData->y;
@@ -655,14 +366,14 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 		pObject.setRotate(h, p, r);
 
 		// Object ID 중복 채크 [7/8/2010 boxface]
-		if (m_pObjectManager.checkObjectID(rcvData->objectID) != true)
+		if (pMainDlg->m_pObjectManager.checkObjectID(rcvData->objectID) != true)
 		{
 			// 객체관리 클래스에 전달 [7/8/2010 boxface]
-			m_pObjectManager.addObject(pObject);
+			pMainDlg->m_pObjectManager.addObject(pObject);
 
 			// GUI 정보 업데이트 [6/15/2010 boxface]
 			//////////////////////////////////////////////////////////////////////////
-			
+
 			pMainDlg->addObject(rcvData->objectID);
 		}
 		else
@@ -715,7 +426,7 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 	case OBJECT_CTRL_DELETE:
 	{
 		// 객체관리 클래스에 전달 [7/8/2010 boxface]
-		m_pObjectManager.delObject(rcvData->objectID);
+		pMainDlg->m_pObjectManager.delObject(rcvData->objectID);
 
 		// GUI 정보 업데이트 [6/15/2010 boxface]
 		//////////////////////////////////////////////////////////////////////////
@@ -724,6 +435,87 @@ void TCPFunc::onObjectCtrl(EVENT_OBJECT_CONTROL* rcvData)
 	break;
 	default:
 		//dhPrint("CMainFrame::onObjectCtrl invalid data !!!\n");
+		break;
+	}
+}
+
+void TCPFunc::onTorpedoAdd(int parentID, SUB_OBJECT_INFO* rcvData)
+{
+	CTestFramework_TDCtrlDlg* pMainDlg = (CTestFramework_TDCtrlDlg*)::AfxGetApp()->GetMainWnd();
+	int i, count = pMainDlg->m_pObjectManager.m_ObjectList.size();
+	for (i = 0; i<count; i++)
+	{
+		if (pMainDlg->m_pObjectManager.m_ObjectList[i].getObjectID() == parentID)
+		{
+			STRUCT_TORPEDO_INFO pTorpedo;
+
+			pTorpedo.iObjectID = rcvData->objectID;
+			pTorpedo.iImageType = rcvData->imageType;
+			pTorpedo.bFired = false;
+
+			pMainDlg->m_pObjectManager.m_ObjectList[i].m_vTorpedoList.push_back(pTorpedo);
+
+			TRACE("CMainFrame::onTorpedoAdd => ID:%d 인 플랫폼에 ID:%d인 어뢰가 탑제되었다.!!\n", parentID, rcvData->objectID);
+		}
+	}
+}
+
+void TCPFunc::onDecoyAdd(int parentID, SUB_OBJECT_INFO* rcvData)
+{
+	CTestFramework_TDCtrlDlg* pMainDlg = (CTestFramework_TDCtrlDlg*)::AfxGetApp()->GetMainWnd();
+	int i, count = pMainDlg->m_pObjectManager.m_ObjectList.size();
+	for (i = 0; i<count; i++)
+	{
+		if (pMainDlg->m_pObjectManager.m_ObjectList[i].getObjectID() == parentID)
+		{
+			STRUCT_DECOY_INFO pDecoy;
+
+			pDecoy.iObjectID = rcvData->objectID;
+			pDecoy.iImageType = rcvData->imageType;
+			pDecoy.bFired = false;
+
+			pMainDlg->m_pObjectManager.m_ObjectList[i].m_vDecoyList.push_back(pDecoy);
+
+			TRACE("CMainFrame::onDecoyAdd => ID:%d 인 플랫폼에 ID:%d인 기만기가 탑제되었다.!!\n", parentID, rcvData->objectID);
+		}
+	}
+}
+
+void TCPFunc::onSimulationCtrl(EVENT_SIMULATION_CONTROL* rcvData)
+{
+	
+	switch (rcvData->control_code)
+	{
+	case SIMCTRL_STANDBY:
+	{
+
+		// thread 제어 [7/19/2010 boxface]
+		m_Thread.onThreadEnd();
+		
+	}
+	break;
+	case SIMCTRL_START:
+	{
+
+		// thread 제어 [7/19/2010 boxface]
+		m_Thread.onThreadStart();
+	}
+	break;
+	case SIMCTRL_PAUSE:
+	{
+		// thread 제어 [7/19/2010 boxface]
+		m_Thread.onThreadPause();
+	}
+	break;
+	case SIMCTRL_STOP:
+	{
+
+		// thread 제어 [7/19/2010 boxface]
+		m_Thread.onThreadEnd();
+	}
+	break;
+	default:
+		//dhPrint("unknown control code[%d]를 수신하였음 !!\n", rcvData->control_code);
 		break;
 	}
 }

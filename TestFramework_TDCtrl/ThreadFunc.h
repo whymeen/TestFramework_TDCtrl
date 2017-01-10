@@ -1,5 +1,3 @@
-#include "TestFramework_TDCtrl.h"
-#include "TestFramework_TDCtrlDlg.h"
 
 #pragma once
 class ThreadFunc

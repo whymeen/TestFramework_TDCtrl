@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "ThreadFunc.h"
+#include "TCPFunc.h"
+#include "TestFramework_TDCtrlDlg.h"
 
 
 ThreadFunc::ThreadFunc()
 {
+	m_bStopMainThread = TRUE;
 }
 
 
@@ -14,8 +17,9 @@ ThreadFunc::~ThreadFunc()
 
 UINT ThreadFunc::MainThreadFunc(LPVOID pParam)
 {
-
+	
 	ThreadFunc* pThread = (ThreadFunc*)pParam;
+	//CTestFramework_TDCtrlDlg* pMainDlg = (CTestFramework_TDCtrlDlg*)::AfxGetApp()->GetMainWnd();
 	int FrameLimit;
 	int index = 0;
 
@@ -44,10 +48,11 @@ UINT ThreadFunc::MainThreadFunc(LPVOID pParam)
 		//////////////////////////////////////////////////////////////////////////
 
 		// 데이터 처리 [6/14/2010 boxface]
+		TRACE("스레드 호출\n");
 		pThread->process();
 
 		// 객체정보 전달 [6/14/2010 boxface]
-		///pFrame->SendObjectUpdate();
+		//pMainDlg->m_TCPfunc.SendEventData(); 
 
 		// 메시지 버퍼에 있는 정보 전달 [7/6/2010 boxface]
 		// 타이머로 이동 [7/8/2010 boxface]
@@ -89,9 +94,11 @@ UINT ThreadFunc::MainThreadFunc(LPVOID pParam)
 
 void ThreadFunc::onThreadStart()
 {
+	TRACE("스레드 실행 \n");
 	if (m_bStopMainThread == TRUE)
 	{
 		m_bStopMainThread = FALSE;
+
 		m_pMainThread = AfxBeginThread(MainThreadFunc, (LPVOID)this);
 		m_hMainThread = m_pMainThread->m_hThread;
 
@@ -107,6 +114,7 @@ void ThreadFunc::onThreadStart()
 
 void ThreadFunc::onThreadPause()
 {
+	TRACE("스레드 멈춤 \n");
 	m_pMainThread->SuspendThread();
 	m_bStopMainThread = FALSE;
 }
@@ -114,6 +122,7 @@ void ThreadFunc::onThreadPause()
 
 void ThreadFunc::onThreadEnd()
 {
+	TRACE("스레드 정지 \n");
 	if (!m_hMainThread)
 		return;
 
@@ -143,7 +152,7 @@ void ThreadFunc::onThreadEnd()
 
 void ThreadFunc::process()
 {
-	CTestFramework_TDCtrlDlg* pMain = (CTestFramework_TDCtrlDlg*)AfxGetMainWnd();
+	CTestFramework_TDCtrlDlg* pMain = (CTestFramework_TDCtrlDlg*)::AfxGetApp()->GetMainWnd();
 	int i, count = pMain->m_pObjectManager.GetSize();
 
 	int iObjectID;

@@ -80,9 +80,6 @@
     <ClCompile Include="TubeAssignmentDlg.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectSocket.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadFunc.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
